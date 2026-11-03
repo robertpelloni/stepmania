@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StepMania Unified Operator & Player Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header Bar with System Tray & Live Engine Status -->
+  <header class="header-bar">
+    <div class="logo-area">
+      <span class="logo-icon">🕹️</span>
+      <h1>StepMania <span class="badge" id="appVersion">v0.2.0</span></h1>
+      <span class="subtitle">Unified Rhythm Suite & Arcade Operator Control Plane</span>
+    </div>
+
+    <div class="header-right">
+      <!-- Tray Controller -->
+      <div class="tray-container" id="trayContainer">
+        <button class="tray-button" id="trayToggleBtn" title="System Tray: Server daemon management and quick controls" data-tooltip="System tray manager: pause, restart, or quit rhythm daemons">
+          <span class="tray-icon">⚙️</span> System Tray
+          <span class="tray-status-dot online" id="trayStatusDot"></span>
+        </button>
+        <div class="tray-menu" id="trayMenu">
+          <div class="tray-header">Rhythm Engine Daemon</div>
+          <button class="tray-item" id="trayStartBtn">▶️ Start Daemons</button>
+          <button class="tray-item" id="trayRestartBtn">🔄 Restart Daemons</button>
+          <button class="tray-item" id="trayPauseBtn">⏸️ Pause Sync</button>
+          <div class="tray-divider"></div>
+          <button class="tray-item danger" id="trayQuitBtn">🛑 Quit Server Daemons</button>
+        </div>
+      </div>
+
+      <div class="status-pill" id="globalEngineStatus">
+        <span class="status-indicator live"></span>
+        <span class="status-text" id="engineStatusText">Daemon Active (Port 8080)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Consolidated Main Page Layout -->
+  <main class="dashboard-container">
+
+    <!-- HIGH-VALUE SECTION 1: Engine Launcher & Active Profile -->
+    <section class="card hero-card" id="highValueSection">
+      <div class="card-header">
+        <div class="header-title-group">
+          <h2>⚡ Instant Game Launcher & Active Player Profile</h2>
+          <span class="hint-badge" data-tooltip="Primary game control: Select runtime fork and active fitness profile">Highest Value Control</span>
+        </div>
+      </div>
+      <div class="card-body launcher-grid">
+        <!-- Fork Selection & Launch Buttons -->
+        <div class="launcher-controls">
+          <label for="engineForkSelect" class="form-label" title="Target Rhythm Fork" data-tooltip="Switch between BobMania arcade fork, ITGmania competitive fork, or FCDM fitness platform">
+            Select Rhythm Suite Fork: ℹ️
+          </label>
+          <select id="engineForkSelect" class="form-select">
+            <option value="bobmania">bobmania (Robert Pelloni Custom SM5 Fork)</option>
+            <option value="itgmania" selected>itgmania (Modern ITG Engine & Timing Standard)</option>
+            <option value="fcdm">fcdm (Fitness Center Dance Machine)</option>
+            <option value="stepmania">stepmania (Upstream Engine 5.1/5.3)</option>
+          </select>
+
+          <div class="launch-actions">
+            <button class="btn btn-primary" id="launchGameBtn" data-tooltip="Launch the selected rhythm game executable in low-latency arcade mode">
+              🚀 Launch Game
+            </button>
+            <button class="btn btn-secondary" id="openSongsFolderBtn" data-tooltip="Open local system Songs / Packs directory">
+              📂 Browse Songs
+            </button>
+            <button class="btn btn-warning" id="reloadPacksBtn" data-tooltip="Send IPC signal to reload song packs without restarting">
+              🔄 Reload Cache
+            </button>
+          </div>
+          <div class="launch-feedback" id="launchFeedback">Status: Engine standby. Ready to launch.</div>
+        </div>
+
+        <!-- Active Profile Card -->
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="avatar">💃</div>
+            <div>
+              <h3 id="profileName">Robert P. (Arcade Operator)</h3>
+              <span class="profile-sub">Level 85 • Fitness Pro • 1200+ Songs Cleared</span>
+            </div>
+          </div>
+          <div class="profile-metrics">
+            <div class="metric-item">
+              <span class="metric-label">Session Calories</span>
+              <span class="metric-value highlight" id="statCalories">482 kcal</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Average Accuracy</span>
+              <span class="metric-value" id="statAccuracy">98.42%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Global Timing Offset</span>
+              <span class="metric-value" id="statOffset">-0.009s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TWO-COLUMN GRID: Song Packs & Input Diagnostics -->
+    <div class="columns-grid">
+
+      <!-- SECTION 2: Song Pack Manager -->
+      <section class="card" id="songPackSection">
+        <div class="card-header">
+          <div class="header-title-group">
+            <h2>🎵 Song Pack Manager</h2>
+            <span class="hint-badge" data-tooltip="Manage dance steps, simfiles (.sm, .ssc), and pack directories">Consolidated Simfiles</span>
+          </div>
+          <button class="btn btn-sm btn-outline" id="scanSongsBtn" data-tooltip="Scan filesystem for newly placed simfile packs">Scan Packs</button>
+        </div>
+        <div class="card-body">
+          <div class="pack-dropzone" id="packDropzone" data-tooltip="Drag and drop song packs (.zip or folder) here for automated installation">
+            <p>📥 Drag & Drop song zip/folders here or <span class="link-text">choose file</span></p>
+            <span class="drop-hint">Supports .sm, .ssc, .dwi, and modern .ogg audio</span>
+          </div>
+
+          <div class="pack-list" id="packList">
+            <div class="pack-item">
+              <div class="pack-info">
+                <strong>In The Groove 1 & 2 Official</strong>
+                <span>142 Songs • Full ITG Stater Pack • Verified Hashes</span>
+              </div>
+              <span class="badge badge-success">Mounted</span>
+            </div>
+            <div class="pack-item">
+              <div class="pack-info">
+                <strong>DanceDanceRevolution A3 / World Simfiles</strong>
+                <span>188 Songs • Expert / Challenge Steps • Video BGs</span>
+              </div>
+              <span class="badge badge-success">Mounted</span>
+            </div>
+            <div class="pack-item">
+              <div class="pack-info">
+                <strong>FCDM Fitness Aerobics Pack Vol. 1</strong>
+                <span>45 Songs • High-Calorie Choreography</span>
+              </div>
+              <span class="badge badge-success">Mounted</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: Hardware Diagnostics & Input Visualizer -->
+      <section class="card" id="hardwareSection">
+        <div class="card-header">
+          <div class="header-title-group">
+            <h2>🕹️ Hardware Diagnostics & Pad Visualizer</h2>
+            <span class="hint-badge" data-tooltip="Live 1000Hz USB pad polling, debounce calibration, and sensor responsiveness">Real-Time IO</span>
+          </div>
+          <span class="badge badge-info" id="pollingBadge">1000 Hz Polling</span>
+        </div>
+        <div class="card-body">
+          <!-- 4-panel visualizer -->
+          <div class="dance-pad-visualizer">
+            <div class="pad-row">
+              <div class="pad-panel panel-up" id="padUp" title="Up Arrow" data-tooltip="Up panel sensor array status">⬆️</div>
+            </div>
+            <div class="pad-row">
+              <div class="pad-panel panel-left" id="padLeft" title="Left Arrow" data-tooltip="Left panel sensor array status">⬅️</div>
+              <div class="pad-panel panel-center" id="padCenter">⚙️</div>
+              <div class="pad-panel panel-right" id="padRight" title="Right Arrow" data-tooltip="Right panel sensor array status">➡️</div>
+            </div>
+            <div class="pad-row">
+              <div class="pad-panel panel-down" id="padDown" title="Down Arrow" data-tooltip="Down panel sensor array status">⬇️</div>
+            </div>
+          </div>
+
+          <div class="hardware-tuning">
+            <div class="form-group">
+              <label for="debounceRange" data-tooltip="Debounce filtering window in milliseconds to eliminate false contact bounce">
+                Pad Debounce Window: <span id="debounceVal">12 ms</span> ℹ️
+              </label>
+              <input type="range" id="debounceRange" min="2" max="30" value="12" class="form-range">
+            </div>
+            <div class="form-group">
+              <label for="offsetRange" data-tooltip="Global machine audio sync offset in milliseconds">
+                Global Audio Sync Offset: <span id="offsetVal">-9 ms</span> ℹ️
+              </label>
+              <input type="range" id="offsetRange" min="-50" max="50" value="-9" class="form-range">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- SECTION 4: Server Daemon & Ecosystem Status -->
+    <section class="card" id="daemonsSection">
+      <div class="card-header">
+        <div class="header-title-group">
+          <h2>🌐 Rhythm Daemons & Network Supervision</h2>
+          <span class="hint-badge" data-tooltip="Centralized controller for local score daemons, groovestats sync, and IPC bridges">System Services</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-sm btn-outline" id="refreshDaemonsBtn">Refresh Services</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="services-table-wrapper">
+          <table class="services-table">
+            <thead>
+              <tr>
+                <th>Service Name</th>
+                <th>Target Component</th>
+                <th>Status</th>
+                <th>Port / Transport</th>
+                <th>Uptime</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="servicesList">
+              <tr>
+                <td><strong>SM Control Daemon</strong></td>
+                <td>stepmania / bobmania IPC</td>
+                <td><span class="badge badge-success">Running</span></td>
+                <td>TCP 8080 (REST / WS)</td>
+                <td>03:42:18</td>
+                <td><button class="btn btn-xs btn-outline restart-srv" data-service="sm_daemon">Restart</button></td>
+              </tr>
+              <tr>
+                <td><strong>Groovestats Live Sync</strong></td>
+                <td>itgmania Score Tracker</td>
+                <td><span class="badge badge-success">Online</span></td>
+                <td>HTTPS TLS v1.3</td>
+                <td>03:42:15</td>
+                <td><button class="btn btn-xs btn-outline restart-srv" data-service="groovestats">Sync Now</button></td>
+              </tr>
+              <tr>
+                <td><strong>FCDM Fitness Metrics Engine</strong></td>
+                <td>fcdm Calorie Daemon</td>
+                <td><span class="badge badge-success">Active</span></td>
+                <td>Unix Socket /tmp/fcdm.sock</td>
+                <td>03:40:02</td>
+                <td><button class="btn btn-xs btn-outline restart-srv" data-service="fcdm">Flush</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer-bar">
+    <span>StepMania Autonomous Management Suite • Single-Page Consolidated Operator Architecture</span>
+    <span>Ecosystem: <a href="https://github.com/robertpelloni/bobmania">bobmania</a> | <a href="https://github.com/robertpelloni/itgmania">itgmania</a> | <a href="https://github.com/robertpelloni/fcdm">fcdm</a></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

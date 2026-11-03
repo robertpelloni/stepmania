@@ -1,16 +1,14 @@
 # TODO.md — Action Items & Short-Term Tasks
 
-## Documentation & Governance
-- [x] Create canonical `VERSION.md` with semantic versioning.
-- [x] Document vision and architecture in `VISION.md`.
-- [x] Document repository memory and architectural traits in `MEMORY.md`.
-- [x] Document deployment workflows in `DEPLOY.md`.
-- [x] Outline refactoring and expansion ideas in `IDEAS.md`.
-- [x] Maintain strategic roadmap in `ROADMAP.md`.
-- [x] Record change log in `CHANGELOG.md`.
-- [x] Prepare session handoff notes in `HANDOFF.md`.
-- [x] Update `README.md` to reference all governance documents.
+## Dashboard & System Tray Implementation (v0.2.0)
+- [x] Create single-page consolidated Operator & Player Dashboard in `dashboard/index.html`.
+- [x] Design modern cyberpunk arcade dark theme in `dashboard/styles.css`.
+- [x] Implement UI reactivity, pad simulation, and daemon controls in `dashboard/app.js`.
+- [x] Build multi-threaded HTTP/REST daemon `dashboard/daemon.py` with `/health`, `/api/control/*`, and `/api/launch`.
+- [x] Build system tray controller CLI `dashboard/tray_service.py`.
+- [x] Add operational startup and shutdown scripts in `scripts/`.
+- [x] Verify API endpoints and capture frontend screenshot verification.
 
-## Repository & Ecosystem Maintenance
-- [ ] Monitor upstream [stepmania/stepmania](https://github.com/stepmania/stepmania) for critical bug fixes and upstream security patches.
-- [ ] Keep cross-links up to date with [bobmania](https://github.com/robertpelloni/bobmania), [itgmania](https://github.com/robertpelloni/itgmania), and [fcdm](https://github.com/robertpelloni/fcdm).
+## Future Milestones
+- [ ] Implement native OS tray integration via `pystray` or QT for desktop daemon mode.
+- [ ] Connect WebSocket feed to real-time StepMania 5 memory offsets / OutFox / ITGmania JSON output.
