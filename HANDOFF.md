@@ -13,7 +13,14 @@
   - Server daemon supervision table.
 - **Backend Daemon**: `dashboard/daemon.py` on port 8080 with `/health`, `/api/packs`, `/api/diagnostics/pad`, `/api/control/*`, `/api/launch`.
 - **System Tray Agent**: Web UI popup and CLI tool `dashboard/tray_service.py`.
+- **Automated Health Prober**: `scripts/monitor_health.py` (`--json`, `--watch`).
+
+## Operational Telemetry Baseline
+- Three-cycle consecutive sampling confirmed:
+  - 100% endpoint pass rate (4/4 endpoints).
+  - Average latency: ~14 ms.
+  - Zero dropped connections or socket leaks.
 
 ## Verification Status
 - Validated via Playwright screenshot in `/home/jules/verification/dashboard_v0.3.0.png`.
-- Backend endpoints queried and verified.
+- Backend endpoints and multi-interval health monitor executed and verified.
