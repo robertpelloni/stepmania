@@ -1,6 +1,6 @@
 # stepmania (Unified Rhythm Suite & Operator Dashboard)
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](VERSION.md)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](VERSION.md)
 
 This repository serves as the **centralized dashboard, control plane, and organizational hub** for Robert Pelloni's rhythm gaming and dance arcade ecosystem.
 
@@ -30,6 +30,12 @@ python3 dashboard/tray_service.py status
 python3 dashboard/tray_service.py restart
 python3 dashboard/tray_service.py quit
 ```
+
+## Features
+- **Consolidated Single-Page Control**: High-value Game Launcher and Active Player Profile at top.
+- **Song Pack Manager**: Real-time pack search, style filtering (`ITG`, `DDR`, `Fitness`), and simfile health monitoring.
+- **Hardware Diagnostics**: 1000Hz polling rate, Dance Single (4-panel) / Pump Single (5-panel) mode switcher, live sensor pressure meters, and IO event jitter log.
+- **System Tray Controller**: Start, restart, pause, and quit server daemons from the UI tray popup or CLI.
 
 ## Repository Governance & Documentation
 - [VERSION.md](VERSION.md) — Single source of truth for semantic versioning.

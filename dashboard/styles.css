@@ -275,6 +275,30 @@ body {
   border-color: var(--accent-cyan);
 }
 
+.form-select-sm {
+  background-color: var(--bg-tertiary);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.form-input {
+  background-color: var(--bg-tertiary);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--accent-cyan);
+}
+
 .launch-actions {
   display: flex;
   gap: 12px;
@@ -422,10 +446,20 @@ body {
 }
 
 /* Song Pack Manager */
+.pack-filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.pack-filter-bar .form-input {
+  flex: 1;
+}
+
 .pack-dropzone {
   border: 2px dashed var(--border-color);
   border-radius: var(--border-radius);
-  padding: 20px;
+  padding: 16px;
   text-align: center;
   margin-bottom: 16px;
   cursor: pointer;
@@ -452,6 +486,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
 }
 
 .pack-item {
@@ -475,13 +511,33 @@ body {
   color: var(--text-muted);
 }
 
+.pack-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pack-meta-summary {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.text-green {
+  color: var(--accent-green);
+}
+
 /* Pad Visualizer */
 .dance-pad-visualizer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .pad-row {
@@ -490,8 +546,8 @@ body {
 }
 
 .pad-panel {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   background-color: var(--bg-tertiary);
   border: 2px solid var(--border-color);
   border-radius: 8px;
@@ -517,10 +573,56 @@ body {
   border-style: dashed;
 }
 
+/* Sensor Sensitivity Bars */
+.sensor-bars-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  background-color: rgba(0,0,0,0.2);
+  padding: 10px;
+  border-radius: var(--border-radius);
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.sensor-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.sensor-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00e5ff, #ff2a85);
+  border-radius: 4px;
+  transition: width 0.1s ease;
+}
+
+.sensor-val {
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
 .hardware-tuning {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  margin-bottom: 16px;
 }
 
 .form-group label {
@@ -532,6 +634,39 @@ body {
 
 .form-range {
   width: 100%;
+}
+
+/* IO Event Stream Log */
+.io-event-log-container {
+  background-color: rgba(0,0,0,0.25);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px;
+}
+
+.event-log-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 4px;
+}
+
+.event-log-box {
+  max-height: 80px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #a0c0d8;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.log-entry {
+  white-space: nowrap;
 }
 
 /* Services Table */

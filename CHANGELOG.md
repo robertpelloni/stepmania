@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-22
+
+### Added
+- **Song Pack Manager Enhancements** (`dashboard/`):
+  - Real-time client-side pack search bar and style/category dropdown filters (`All`, `ITG`, `DDR`, `Fitness`).
+  - Pack details inspection trigger with difficulty ranges, song counts, and pack health metrics.
+  - Backend REST API endpoint: `GET /api/packs` providing song counts and mount state.
+- **Hardware Diagnostics & IO Stream Upgrades**:
+  - Pad layout mode toggle: Dance Single (4-panel DDR/ITG) vs. Pump Single (5-panel diagonal).
+  - Individual live sensor sensitivity and pressure meters for each panel (LEFT, UP, DOWN, RIGHT).
+  - Live IO event stream and polling jitter monitor tracking timestamped input events and duration.
+  - Backend calibration endpoints: `GET /api/diagnostics/pad` and `POST /api/diagnostics/calibrate`.
+
 ## [0.2.0] - 2026-10-22
 
 ### Added

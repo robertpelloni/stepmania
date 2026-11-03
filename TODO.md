@@ -1,14 +1,14 @@
 # TODO.md — Action Items & Short-Term Tasks
 
-## Dashboard & System Tray Implementation (v0.2.0)
-- [x] Create single-page consolidated Operator & Player Dashboard in `dashboard/index.html`.
-- [x] Design modern cyberpunk arcade dark theme in `dashboard/styles.css`.
-- [x] Implement UI reactivity, pad simulation, and daemon controls in `dashboard/app.js`.
-- [x] Build multi-threaded HTTP/REST daemon `dashboard/daemon.py` with `/health`, `/api/control/*`, and `/api/launch`.
-- [x] Build system tray controller CLI `dashboard/tray_service.py`.
-- [x] Add operational startup and shutdown scripts in `scripts/`.
-- [x] Verify API endpoints and capture frontend screenshot verification.
+## Dashboard Enhancements (v0.3.0)
+- [x] Implement live song pack search bar and style/genre category filter.
+- [x] Add pack details inspector and simfile health stats.
+- [x] Implement pad mode switcher (Dance Single 4-panel vs. Pump Single 5-panel).
+- [x] Add individual sensor sensitivity/pressure meter bars (LEFT, UP, DOWN, RIGHT).
+- [x] Add live IO event stream log with polling jitter monitor.
+- [x] Implement `/api/packs` and `/api/diagnostics/pad` endpoints in `dashboard/daemon.py`.
+- [x] Verify UI functionality with Playwright automated screenshot.
 
 ## Future Milestones
-- [ ] Implement native OS tray integration via `pystray` or QT for desktop daemon mode.
-- [ ] Connect WebSocket feed to real-time StepMania 5 memory offsets / OutFox / ITGmania JSON output.
+- [ ] Implement physical USB input polling via Linux `evdev` driver binding.
+- [ ] Connect WebSocket feed to real-time StepMania 5 / OutFox / ITGmania memory state.

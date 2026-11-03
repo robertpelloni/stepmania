@@ -11,7 +11,7 @@
   <header class="header-bar">
     <div class="logo-area">
       <span class="logo-icon">🕹️</span>
-      <h1>StepMania <span class="badge" id="appVersion">v0.2.0</span></h1>
+      <h1>StepMania <span class="badge" id="appVersion">v0.3.0</span></h1>
       <span class="subtitle">Unified Rhythm Suite & Arcade Operator Control Plane</span>
     </div>
 
@@ -107,65 +107,100 @@
     <!-- TWO-COLUMN GRID: Song Packs & Input Diagnostics -->
     <div class="columns-grid">
 
-      <!-- SECTION 2: Song Pack Manager -->
+      <!-- SECTION 2: Enhanced Song Pack Manager -->
       <section class="card" id="songPackSection">
         <div class="card-header">
           <div class="header-title-group">
             <h2>🎵 Song Pack Manager</h2>
             <span class="hint-badge" data-tooltip="Manage dance steps, simfiles (.sm, .ssc), and pack directories">Consolidated Simfiles</span>
           </div>
-          <button class="btn btn-sm btn-outline" id="scanSongsBtn" data-tooltip="Scan filesystem for newly placed simfile packs">Scan Packs</button>
+          <div class="header-actions">
+            <button class="btn btn-sm btn-outline" id="scanSongsBtn" data-tooltip="Scan filesystem for newly placed simfile packs">Scan Packs</button>
+          </div>
         </div>
         <div class="card-body">
+          <!-- Search & Filter Controls -->
+          <div class="pack-filter-bar">
+            <input type="text" id="packSearchInput" class="form-input" placeholder="🔍 Search installed packs by name or style..." data-tooltip="Filter installed song packs in real-time">
+            <select id="packFilterSelect" class="form-select-sm" data-tooltip="Filter packs by game type or fitness category">
+              <option value="all">All Styles</option>
+              <option value="itg">ITG / Tech</option>
+              <option value="ddr">DDR Classics</option>
+              <option value="fitness">FCDM Fitness</option>
+            </select>
+          </div>
+
           <div class="pack-dropzone" id="packDropzone" data-tooltip="Drag and drop song packs (.zip or folder) here for automated installation">
             <p>📥 Drag & Drop song zip/folders here or <span class="link-text">choose file</span></p>
             <span class="drop-hint">Supports .sm, .ssc, .dwi, and modern .ogg audio</span>
           </div>
 
+          <!-- Interactive Pack List with Details & Actions -->
           <div class="pack-list" id="packList">
-            <div class="pack-item">
+            <!-- Dynamically populated or rendered items -->
+            <div class="pack-item" data-style="itg">
               <div class="pack-info">
                 <strong>In The Groove 1 & 2 Official</strong>
-                <span>142 Songs • Full ITG Stater Pack • Verified Hashes</span>
+                <span>142 Songs • Difficulty 1–13 • Verified Hashes</span>
               </div>
-              <span class="badge badge-success">Mounted</span>
+              <div class="pack-actions">
+                <span class="badge badge-success">Mounted</span>
+                <button class="btn btn-xs btn-outline view-pack-btn" data-pack="itg" data-tooltip="View pack songlist and step charts">Details</button>
+              </div>
             </div>
-            <div class="pack-item">
+            <div class="pack-item" data-style="ddr">
               <div class="pack-info">
                 <strong>DanceDanceRevolution A3 / World Simfiles</strong>
-                <span>188 Songs • Expert / Challenge Steps • Video BGs</span>
+                <span>188 Songs • Difficulty 1–19 • Video BGs</span>
               </div>
-              <span class="badge badge-success">Mounted</span>
+              <div class="pack-actions">
+                <span class="badge badge-success">Mounted</span>
+                <button class="btn btn-xs btn-outline view-pack-btn" data-pack="ddr" data-tooltip="View pack songlist and step charts">Details</button>
+              </div>
             </div>
-            <div class="pack-item">
+            <div class="pack-item" data-style="fitness">
               <div class="pack-info">
                 <strong>FCDM Fitness Aerobics Pack Vol. 1</strong>
                 <span>45 Songs • High-Calorie Choreography</span>
               </div>
-              <span class="badge badge-success">Mounted</span>
+              <div class="pack-actions">
+                <span class="badge badge-success">Mounted</span>
+                <button class="btn btn-xs btn-outline view-pack-btn" data-pack="fitness" data-tooltip="View pack songlist and step charts">Details</button>
+              </div>
             </div>
+          </div>
+
+          <div class="pack-meta-summary" id="packMetaSummary">
+            <span>Total Mounted: <strong>3 packs (375 songs)</strong></span>
+            <span>Simfile Health: <strong class="text-green">100% OK</strong></span>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 3: Hardware Diagnostics & Input Visualizer -->
+      <!-- SECTION 3: Enhanced Hardware Diagnostics & Pad Visualizer -->
       <section class="card" id="hardwareSection">
         <div class="card-header">
           <div class="header-title-group">
             <h2>🕹️ Hardware Diagnostics & Pad Visualizer</h2>
             <span class="hint-badge" data-tooltip="Live 1000Hz USB pad polling, debounce calibration, and sensor responsiveness">Real-Time IO</span>
           </div>
-          <span class="badge badge-info" id="pollingBadge">1000 Hz Polling</span>
+          <div class="header-actions">
+            <select id="padModeSelect" class="form-select-sm" data-tooltip="Switch visualizer layout between 4-panel Dance (DDR/ITG) and 5-panel Pump">
+              <option value="dance-single">Dance Single (4-Panel)</option>
+              <option value="pump-single">Pump Single (5-Panel)</option>
+            </select>
+            <span class="badge badge-info" id="pollingBadge" data-tooltip="USB polling frequency detected from Linux evdev/HID driver">1000 Hz Polling</span>
+          </div>
         </div>
         <div class="card-body">
-          <!-- 4-panel visualizer -->
-          <div class="dance-pad-visualizer">
+          <!-- Pad Visualizer -->
+          <div class="dance-pad-visualizer" id="padVisualizer">
             <div class="pad-row">
               <div class="pad-panel panel-up" id="padUp" title="Up Arrow" data-tooltip="Up panel sensor array status">⬆️</div>
             </div>
             <div class="pad-row">
               <div class="pad-panel panel-left" id="padLeft" title="Left Arrow" data-tooltip="Left panel sensor array status">⬅️</div>
-              <div class="pad-panel panel-center" id="padCenter">⚙️</div>
+              <div class="pad-panel panel-center" id="padCenter" data-tooltip="Center cabinet sensor or Pump center panel">⚙️</div>
               <div class="pad-panel panel-right" id="padRight" title="Right Arrow" data-tooltip="Right panel sensor array status">➡️</div>
             </div>
             <div class="pad-row">
@@ -173,6 +208,31 @@
             </div>
           </div>
 
+          <!-- Sensor Sensitivity & Live Pressure Meters -->
+          <div class="sensor-bars-container">
+            <div class="sensor-bar-item">
+              <span class="sensor-label">LEFT</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="barLeft" style="width: 82%;"></div></div>
+              <span class="sensor-val" id="valLeft">82%</span>
+            </div>
+            <div class="sensor-bar-item">
+              <span class="sensor-label">UP</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="barUp" style="width: 88%;"></div></div>
+              <span class="sensor-val" id="valUp">88%</span>
+            </div>
+            <div class="sensor-bar-item">
+              <span class="sensor-label">DOWN</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="barDown" style="width: 85%;"></div></div>
+              <span class="sensor-val" id="valDown">85%</span>
+            </div>
+            <div class="sensor-bar-item">
+              <span class="sensor-label">RIGHT</span>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="barRight" style="width: 90%;"></div></div>
+              <span class="sensor-val" id="valRight">90%</span>
+            </div>
+          </div>
+
+          <!-- Hardware Tuning Sliders -->
           <div class="hardware-tuning">
             <div class="form-group">
               <label for="debounceRange" data-tooltip="Debounce filtering window in milliseconds to eliminate false contact bounce">
@@ -185,6 +245,19 @@
                 Global Audio Sync Offset: <span id="offsetVal">-9 ms</span> ℹ️
               </label>
               <input type="range" id="offsetRange" min="-50" max="50" value="-9" class="form-range">
+            </div>
+          </div>
+
+          <!-- Live Input Event Stream / Jitter Monitor -->
+          <div class="io-event-log-container">
+            <div class="event-log-header">
+              <span>Live IO Event Stream & Polling Jitter</span>
+              <span class="text-muted" id="jitterVal">Avg Jitter: ±0.18ms</span>
+            </div>
+            <div class="event-log-box" id="eventLogBox">
+              <div class="log-entry">14:02:10.104 [EVDEV] Panel UP pressed (Pressure: 92%, Jitter: +0.08ms)</div>
+              <div class="log-entry">14:02:10.218 [EVDEV] Panel UP released (Duration: 114ms)</div>
+              <div class="log-entry">14:02:10.512 [EVDEV] Panel LEFT pressed (Pressure: 88%, Jitter: -0.12ms)</div>
             </div>
           </div>
         </div>

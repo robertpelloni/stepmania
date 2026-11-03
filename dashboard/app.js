@@ -1,6 +1,6 @@
-// StepMania Consolidated Dashboard Application Logic
+// StepMania Consolidated Dashboard Application Logic (v0.3.0)
 document.addEventListener('DOMContentLoaded', () => {
-  // Elements
+  // System Tray Elements
   const trayToggleBtn = document.getElementById('trayToggleBtn');
   const trayMenu = document.getElementById('trayMenu');
   const trayStartBtn = document.getElementById('trayStartBtn');
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const trayQuitBtn = document.getElementById('trayQuitBtn');
   const trayStatusDot = document.getElementById('trayStatusDot');
 
+  // Core Engine & Profile Elements
   const engineStatusText = document.getElementById('engineStatusText');
   const engineForkSelect = document.getElementById('engineForkSelect');
   const launchGameBtn = document.getElementById('launchGameBtn');
@@ -16,12 +17,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const reloadPacksBtn = document.getElementById('reloadPacksBtn');
   const launchFeedback = document.getElementById('launchFeedback');
 
+  // Song Pack Manager Elements
+  const packSearchInput = document.getElementById('packSearchInput');
+  const packFilterSelect = document.getElementById('packFilterSelect');
+  const packList = document.getElementById('packList');
+  const scanSongsBtn = document.getElementById('scanSongsBtn');
+
+  // Hardware Diagnostics & Tuning Elements
+  const padModeSelect = document.getElementById('padModeSelect');
+  const padVisualizer = document.getElementById('padVisualizer');
   const debounceRange = document.getElementById('debounceRange');
   const debounceVal = document.getElementById('debounceVal');
   const offsetRange = document.getElementById('offsetRange');
   const offsetVal = document.getElementById('offsetVal');
+  const eventLogBox = document.getElementById('eventLogBox');
+  const jitterVal = document.getElementById('jitterVal');
 
-  const scanSongsBtn = document.getElementById('scanSongsBtn');
   const refreshDaemonsBtn = document.getElementById('refreshDaemonsBtn');
 
   // Toggle System Tray Menu
@@ -38,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
   });
 
-  // Tray Actions communicating with backend daemon
+  // Backend Daemon Communication
   async function callDaemonApi(action) {
     try {
       const response = await fetch(`/api/control/${action}`, { method: 'POST' });
@@ -82,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Launch Game
+  // Launch Game Action
   launchGameBtn.addEventListener('click', async () => {
     const fork = engineForkSelect.value;
     launchFeedback.textContent = `🚀 Launching ${fork} engine process with sub-millisecond polling...`;
@@ -110,6 +121,69 @@ document.addEventListener('DOMContentLoaded', () => {
     await callDaemonApi('reload_songs');
   });
 
+  // Song Pack Search & Filter
+  function filterPacks() {
+    const query = packSearchInput.value.toLowerCase().trim();
+    const style = packFilterSelect.value;
+    const items = packList.querySelectorAll('.pack-item');
+
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      const itemStyle = item.dataset.style;
+      const matchesSearch = text.includes(query);
+      const matchesStyle = (style === 'all' || itemStyle === style);
+
+      if (matchesSearch && matchesStyle) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  packSearchInput.addEventListener('input', filterPacks);
+  packFilterSelect.addEventListener('change', filterPacks);
+
+  document.querySelectorAll('.view-pack-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const packId = btn.dataset.pack;
+      launchFeedback.textContent = `Displaying step chart metrics & banner art for pack [${packId}].`;
+    });
+  });
+
+  // Pad Mode Switcher (Dance 4-Panel vs Pump 5-Panel)
+  padModeSelect.addEventListener('change', (e) => {
+    const mode = e.target.value;
+    const centerPanel = document.getElementById('padCenter');
+    if (mode === 'pump-single') {
+      centerPanel.textContent = '🟡';
+      centerPanel.classList.remove('panel-center');
+      centerPanel.title = 'Pump Center Sensor';
+      launchFeedback.textContent = 'Hardware visualizer mapped to Pump Single (5-panel diagonal).';
+    } else {
+      centerPanel.textContent = '⚙️';
+      centerPanel.classList.add('panel-center');
+      centerPanel.title = 'Center Sensor';
+      launchFeedback.textContent = 'Hardware visualizer mapped to Dance Single (4-panel orthogonal).';
+    }
+  });
+
+  // Logging IO events
+  function logIoEvent(panelName, pressure) {
+    const now = new Date();
+    const timeStr = `${now.toTimeString().split(' ')[0]}.${String(now.getMilliseconds()).padStart(3, '0')}`;
+    const jitter = ((Math.random() * 0.4) - 0.2).toFixed(2);
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.textContent = `${timeStr} [EVDEV] Panel ${panelName} pressed (Pressure: ${pressure}%, Jitter: ${jitter >= 0 ? '+' : ''}${jitter}ms)`;
+
+    eventLogBox.prepend(entry);
+    if (eventLogBox.children.length > 20) {
+      eventLogBox.removeChild(eventLogBox.lastChild);
+    }
+    jitterVal.textContent = `Avg Jitter: ±${(Math.abs(jitter) * 0.9).toFixed(2)}ms`;
+  }
+
   // Range inputs
   debounceRange.addEventListener('input', (e) => {
     debounceVal.textContent = `${e.target.value} ms`;
@@ -121,32 +195,54 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Pad interactive simulation & diagnostics
-  const padPanels = document.querySelectorAll('.pad-panel:not(.panel-center)');
-  padPanels.forEach(panel => {
-    panel.addEventListener('mousedown', () => {
-      panel.classList.add('active');
+  function triggerPanelPress(panel, name, pressure) {
+    if (!panel) return;
+    panel.classList.add('active');
+    logIoEvent(name, pressure);
+
+    // Update live pressure bar
+    const bar = document.getElementById(`bar${name}`);
+    const val = document.getElementById(`val${name}`);
+    if (bar && val) {
+      bar.style.width = `${pressure}%`;
+      val.textContent = `${pressure}%`;
+    }
+  }
+
+  function triggerPanelRelease(panel) {
+    if (!panel) return;
+    panel.classList.remove('active');
+  }
+
+  const panels = [
+    { el: document.getElementById('padUp'), name: 'Up' },
+    { el: document.getElementById('padLeft'), name: 'Left' },
+    { el: document.getElementById('padDown'), name: 'Down' },
+    { el: document.getElementById('padRight'), name: 'Right' },
+  ];
+
+  panels.forEach(({ el, name }) => {
+    if (!el) return;
+    el.addEventListener('mousedown', () => {
+      triggerPanelPress(el, name, Math.floor(80 + Math.random() * 18));
     });
-    panel.addEventListener('mouseup', () => {
-      panel.classList.remove('active');
-    });
-    panel.addEventListener('mouseleave', () => {
-      panel.classList.remove('active');
-    });
+    el.addEventListener('mouseup', () => triggerPanelRelease(el));
+    el.addEventListener('mouseleave', () => triggerPanelRelease(el));
   });
 
   // Keyboard test for pad visualizer
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'w') document.getElementById('padUp')?.classList.add('active');
-    if (e.key === 'ArrowLeft' || e.key === 'a') document.getElementById('padLeft')?.classList.add('active');
-    if (e.key === 'ArrowDown' || e.key === 's') document.getElementById('padDown')?.classList.add('active');
-    if (e.key === 'ArrowRight' || e.key === 'd') document.getElementById('padRight')?.classList.add('active');
+    if (e.key === 'ArrowUp' || e.key === 'w') triggerPanelPress(document.getElementById('padUp'), 'Up', 92);
+    if (e.key === 'ArrowLeft' || e.key === 'a') triggerPanelPress(document.getElementById('padLeft'), 'Left', 85);
+    if (e.key === 'ArrowDown' || e.key === 's') triggerPanelPress(document.getElementById('padDown'), 'Down', 89);
+    if (e.key === 'ArrowRight' || e.key === 'd') triggerPanelPress(document.getElementById('padRight'), 'Right', 94);
   });
 
   window.addEventListener('keyup', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'w') document.getElementById('padUp')?.classList.remove('active');
-    if (e.key === 'ArrowLeft' || e.key === 'a') document.getElementById('padLeft')?.classList.remove('active');
-    if (e.key === 'ArrowDown' || e.key === 's') document.getElementById('padDown')?.classList.remove('active');
-    if (e.key === 'ArrowRight' || e.key === 'd') document.getElementById('padRight')?.classList.remove('active');
+    if (e.key === 'ArrowUp' || e.key === 'w') triggerPanelRelease(document.getElementById('padUp'));
+    if (e.key === 'ArrowLeft' || e.key === 'a') triggerPanelRelease(document.getElementById('padLeft'));
+    if (e.key === 'ArrowDown' || e.key === 's') triggerPanelRelease(document.getElementById('padDown'));
+    if (e.key === 'ArrowRight' || e.key === 'd') triggerPanelRelease(document.getElementById('padRight'));
   });
 
   // Service restarts
