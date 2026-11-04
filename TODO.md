@@ -10,13 +10,16 @@
 - [x] Expand `tests/test_daemon.py` to 13 integration tests.
 - [x] Perform Playwright headless browser test and capture full-page screenshot `verification/dashboard_single_page.png`.
 
-## Keybinds & Hardware Configuration (v0.4.0)
+## Keybinds & Hardware Configuration (v0.4.0 - v0.5.0)
 - [x] Design Keybind Manager HTML and CSS under Hardware Diagnostics.
 - [x] Implement dynamic keybinds table rendering and mode switching.
 - [x] Add live press-to-bind listener banner with ESC cancel.
 - [x] Implement backend `GET /api/keybinds` and `POST /api/keybinds` in `dashboard/daemon.py`.
 - [x] Add unit and integration tests for keybinds in `tests/test_daemon.py`.
 - [x] Support reset to factory defaults and save confirmation.
+- [x] Add arcade operator actions (`Coin`, `Service`, `OperatorMenu`) to keybind mappings.
+- [x] Add category filters (`All`, `Gameplay`, `Navigation`, `Arcade Cabinet`) in keybind manager.
+- [x] Add individual `Clear` action buttons per keybind row.
 
 ## Future Milestones
 - [ ] Connect WebSocket feed to real-time StepMania 5 / OutFox / ITGmania memory state.

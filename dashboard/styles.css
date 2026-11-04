@@ -801,9 +801,40 @@ body {
   100% { opacity: 0.8; }
 }
 
+.keybind-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.keybind-cat-btn.active {
+  background-color: var(--accent-cyan);
+  color: #05101a;
+  border-color: var(--accent-cyan);
+  font-weight: bold;
+}
+
+.keybind-category-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.cat-gameplay { background-color: rgba(0, 229, 255, 0.15); color: var(--accent-cyan); }
+.cat-nav { background-color: rgba(255, 145, 0, 0.15); color: var(--accent-orange); }
+.cat-arcade { background-color: rgba(255, 42, 133, 0.15); color: var(--accent-pink); }
+
+.keybind-action-btns {
+  display: flex;
+  gap: 4px;
+}
+
 .keybind-table-wrapper {
   overflow-x: auto;
-  max-height: 220px;
+  max-height: 240px;
   overflow-y: auto;
 }
 

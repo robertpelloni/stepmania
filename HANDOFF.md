@@ -5,10 +5,11 @@
 - **Key Enhancements**:
   1. **UI Hierarchy**: Prominent hero card combining Instant Game Launcher (fork switching for `bobmania`, `itgmania`, `fcdm`, `stepmania`) and Active Player/Operator profile with caloric burn, accuracy, and timing offsets.
   2. **Song Pack Details Drawer**: Expandable pack inspection pane providing song counts, difficulty breakdown (Novice to Expert/Challenge), simfile formats, and local filesystem mount points.
-  3. **Real-Time Logs & Tray Operations**: System tray dropdown and embedded activity log stream with live timestamped event feed and daemon action recording.
-  4. **Single Source of Truth Versioning**: Sourced directly from `VERSION.md` via `get_repo_version()` in `dashboard/daemon.py`, delivered through `/api/version` and `/health`, and rendered across UI badges.
-  5. **Unified Script Orchestration**: Added `scripts/dashboard_ctl.sh` unifying start, stop, restart, probe, logs, test, and help operations.
-  6. **Automated Verification**: Extended unit and integration test suite to 13 tests (`tests/test_daemon.py`), and completed Playwright screenshot verification (`verification/dashboard_single_page.png`).
+  3. **Arcade Input Remapping & Keybinds**: Full remapping matrix with category filters (Gameplay, Navigation, Arcade Cabinet buttons like Coin, Service, Operator Menu), individual binding clearing, and daemon persistence.
+  4. **Real-Time Logs & Tray Operations**: System tray dropdown and embedded activity log stream with live timestamped event feed and daemon action recording.
+  5. **Single Source of Truth Versioning**: Sourced directly from `VERSION.md` via `get_repo_version()` in `dashboard/daemon.py`, delivered through `/api/version` and `/health`, and rendered across UI badges.
+  6. **Unified Script Orchestration**: Added `scripts/dashboard_ctl.sh` unifying start, stop, restart, probe, logs, test, and help operations.
+  7. **Automated Verification**: Extended unit and integration test suite to 13 tests (`tests/test_daemon.py`), and completed Playwright screenshot verification (`verification/dashboard_single_page.png`).
 
 ## File Manifest & Key Paths
 - `VERSION.md`: Single source of truth semantic version (`0.5.0`).

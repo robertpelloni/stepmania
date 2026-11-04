@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2026-11-04
 
 ### Added
+- **Arcade Operator Keybind Configuration & Input Remapping** (`dashboard/`):
+  - Integrated arcade cabinet buttons (`Coin`, `Service`, `OperatorMenu`) alongside rhythm pad arrows and navigation inputs.
+  - Category filtering buttons in the Keybind Manager (`All`, `Gameplay`, `Navigation`, `Arcade Cabinet`).
+  - Keybind clearing capability (`Clear` button per action) with live visual updates and log recording.
+  - Intelligent category classification and fallback in `dashboard/daemon.py` for persistent configuration.
 - **Single-Page Consolidated Operator Architecture Redesign** (`dashboard/`):
   - Re-architected layout into a single, high-value hierarchy: Hero Game Launcher & Active Player Profile card at top, followed by two-column Song Pack Manager and Hardware Pad Visualizer, concluding with System Services & Activity Log stream.
   - Interactive Song Pack Details Inspector drawer with song counts, difficulty breakdown, chart formats, and filesystem storage location.
@@ -19,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `scripts/dashboard_ctl.sh` providing unified command-line control (`start`, `stop`, `restart`, `status`, `probe`, `logs`, `test`).
   - Extended `dashboard/tray_service.py` to support `logs` retrieval from the CLI.
 - **Automated Verification**:
-  - Expanded test suite in `tests/test_daemon.py` to 13 tests covering all new endpoints (`/api/version`, `/api/profile`, `/api/logs`).
+  - Expanded test suite in `tests/test_daemon.py` to 13 tests covering all new endpoints (`/api/version`, `/api/profile`, `/api/logs`, keybind remapping).
   - Playwright end-to-end browser verification script capturing full single-page layout screenshot.
 
 ## [0.4.0] - 2026-10-22

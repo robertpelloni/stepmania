@@ -71,25 +71,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // State
   let currentKeybinds = {
     'dance-single': {
-      'Left': { primary: 'ArrowLeft', secondary: 'D', type: 'dance' },
-      'Down': { primary: 'ArrowDown', secondary: 'F', type: 'dance' },
-      'Up': { primary: 'ArrowUp', secondary: 'J', type: 'dance' },
-      'Right': { primary: 'ArrowRight', secondary: 'K', type: 'dance' },
+      'Left': { primary: 'ArrowLeft', secondary: 'D', type: 'gameplay' },
+      'Down': { primary: 'ArrowDown', secondary: 'F', type: 'gameplay' },
+      'Up': { primary: 'ArrowUp', secondary: 'J', type: 'gameplay' },
+      'Right': { primary: 'ArrowRight', secondary: 'K', type: 'gameplay' },
       'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
-      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' },
+      'Coin': { primary: '5', secondary: 'None', type: 'arcade' },
+      'Service': { primary: 'F2', secondary: 'None', type: 'arcade' },
+      'OperatorMenu': { primary: 'ScrollLock', secondary: 'F1', type: 'arcade' }
     },
     'pump-single': {
-      'DownLeft': { primary: 'Z', secondary: 'Numpad1', type: 'pump' },
-      'UpLeft': { primary: 'Q', secondary: 'Numpad7', type: 'pump' },
-      'Center': { primary: 'S', secondary: 'Numpad5', type: 'pump' },
-      'UpRight': { primary: 'E', secondary: 'Numpad9', type: 'pump' },
-      'DownRight': { primary: 'C', secondary: 'Numpad3', type: 'pump' },
+      'DownLeft': { primary: 'Z', secondary: 'Numpad1', type: 'gameplay' },
+      'UpLeft': { primary: 'Q', secondary: 'Numpad7', type: 'gameplay' },
+      'Center': { primary: 'S', secondary: 'Numpad5', type: 'gameplay' },
+      'UpRight': { primary: 'E', secondary: 'Numpad9', type: 'gameplay' },
+      'DownRight': { primary: 'C', secondary: 'Numpad3', type: 'gameplay' },
       'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
-      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' },
+      'Coin': { primary: '5', secondary: 'None', type: 'arcade' },
+      'Service': { primary: 'F2', secondary: 'None', type: 'arcade' },
+      'OperatorMenu': { primary: 'ScrollLock', secondary: 'F1', type: 'arcade' }
     }
   };
 
   let activeBindingState = null;
+  let activeKeybindFilter = 'all';
 
   const packDataDetails = {
     'itg': {
@@ -552,14 +559,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     keybindsListBody.innerHTML = '';
     for (const [action, binding] of Object.entries(mappings)) {
+      const cat = binding.type || (['Select', 'Back'].includes(action) ? 'nav' : (['Coin', 'Service', 'OperatorMenu'].includes(action) ? 'arcade' : 'gameplay'));
+
+      if (activeKeybindFilter !== 'all' && cat !== activeKeybindFilter) {
+        continue;
+      }
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>${action}</strong></td>
+        <td><span class="keybind-category-badge cat-${cat}">${cat}</span></td>
         <td><span class="key-tag" id="bind_${mode}_${action}_primary">${binding.primary || 'None'}</span></td>
         <td><span class="key-tag secondary" id="bind_${mode}_${action}_secondary">${binding.secondary || 'None'}</span></td>
         <td>
-          <button class="btn btn-xs btn-outline remap-btn" data-action="${action}" data-slot="primary" data-tooltip="Remap primary key/sensor">Primary</button>
-          <button class="btn btn-xs btn-outline remap-btn" data-action="${action}" data-slot="secondary" data-tooltip="Remap secondary key/sensor">Secondary</button>
+          <div class="keybind-action-btns">
+            <button class="btn btn-xs btn-outline remap-btn" data-action="${action}" data-slot="primary" data-tooltip="Remap primary key/sensor">Primary</button>
+            <button class="btn btn-xs btn-outline remap-btn" data-action="${action}" data-slot="secondary" data-tooltip="Remap secondary key/sensor">Secondary</button>
+            <button class="btn btn-xs btn-outline clear-bind-btn" data-action="${action}" data-tooltip="Clear key bindings for this action">Clear</button>
+          </div>
         </td>
       `;
       keybindsListBody.appendChild(tr);
@@ -573,7 +590,36 @@ document.addEventListener('DOMContentLoaded', () => {
         startListeningForBind(action, slot);
       });
     });
+
+    document.querySelectorAll('.clear-bind-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        clearBinding(action);
+      });
+    });
   }
+
+  function clearBinding(action) {
+    const mode = padModeSelect.value || 'dance-single';
+    if (currentKeybinds[mode] && currentKeybinds[mode][action]) {
+      currentKeybinds[mode][action].primary = 'None';
+      currentKeybinds[mode][action].secondary = 'None';
+      renderKeybindsTable();
+      launchFeedback.textContent = `Cleared bindings for ${action}.`;
+      addSystemLog('INFO', `Cleared bindings for action: ${action} (${mode})`);
+    }
+  }
+
+  // Keybind category filtering
+  document.querySelectorAll('.keybind-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.keybind-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeKeybindFilter = btn.dataset.cat;
+      renderKeybindsTable();
+    });
+  });
 
   function startListeningForBind(action, slot) {
     activeBindingState = { action, slot };
@@ -640,21 +686,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   resetKeybindsBtn.addEventListener('click', async () => {
     currentKeybinds['dance-single'] = {
-      'Left': { primary: 'ArrowLeft', secondary: 'D', type: 'dance' },
-      'Down': { primary: 'ArrowDown', secondary: 'F', type: 'dance' },
-      'Up': { primary: 'ArrowUp', secondary: 'J', type: 'dance' },
-      'Right': { primary: 'ArrowRight', secondary: 'K', type: 'dance' },
+      'Left': { primary: 'ArrowLeft', secondary: 'D', type: 'gameplay' },
+      'Down': { primary: 'ArrowDown', secondary: 'F', type: 'gameplay' },
+      'Up': { primary: 'ArrowUp', secondary: 'J', type: 'gameplay' },
+      'Right': { primary: 'ArrowRight', secondary: 'K', type: 'gameplay' },
       'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
-      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' },
+      'Coin': { primary: '5', secondary: 'None', type: 'arcade' },
+      'Service': { primary: 'F2', secondary: 'None', type: 'arcade' },
+      'OperatorMenu': { primary: 'ScrollLock', secondary: 'F1', type: 'arcade' }
     };
     currentKeybinds['pump-single'] = {
-      'DownLeft': { primary: 'Z', secondary: 'Numpad1', type: 'pump' },
-      'UpLeft': { primary: 'Q', secondary: 'Numpad7', type: 'pump' },
-      'Center': { primary: 'S', secondary: 'Numpad5', type: 'pump' },
-      'UpRight': { primary: 'E', secondary: 'Numpad9', type: 'pump' },
-      'DownRight': { primary: 'C', secondary: 'Numpad3', type: 'pump' },
+      'DownLeft': { primary: 'Z', secondary: 'Numpad1', type: 'gameplay' },
+      'UpLeft': { primary: 'Q', secondary: 'Numpad7', type: 'gameplay' },
+      'Center': { primary: 'S', secondary: 'Numpad5', type: 'gameplay' },
+      'UpRight': { primary: 'E', secondary: 'Numpad9', type: 'gameplay' },
+      'DownRight': { primary: 'C', secondary: 'Numpad3', type: 'gameplay' },
       'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
-      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' },
+      'Coin': { primary: '5', secondary: 'None', type: 'arcade' },
+      'Service': { primary: 'F2', secondary: 'None', type: 'arcade' },
+      'OperatorMenu': { primary: 'ScrollLock', secondary: 'F1', type: 'arcade' }
     };
     renderKeybindsTable();
     launchFeedback.textContent = 'Keybinds restored to factory defaults.';

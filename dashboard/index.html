@@ -302,14 +302,23 @@
               <span>Press any key or pad sensor for <strong id="bindingTargetAction">ACTION</strong>... (Esc to cancel)</span>
             </div>
 
+            <div class="keybind-filter-row">
+              <span class="text-muted text-sm">Category Filter:</span>
+              <button class="btn btn-xs btn-outline keybind-cat-btn active" data-cat="all" data-tooltip="Show all input bindings">All</button>
+              <button class="btn btn-xs btn-outline keybind-cat-btn" data-cat="gameplay" data-tooltip="Filter gameplay arrow/pad sensors">Gameplay</button>
+              <button class="btn btn-xs btn-outline keybind-cat-btn" data-cat="nav" data-tooltip="Filter navigation buttons (Select/Back)">Navigation</button>
+              <button class="btn btn-xs btn-outline keybind-cat-btn" data-cat="arcade" data-tooltip="Filter arcade cabinet operator buttons">Arcade Cabinet</button>
+            </div>
+
             <div class="keybind-table-wrapper">
               <table class="keybind-table">
                 <thead>
                   <tr>
                     <th>Action</th>
+                    <th>Category</th>
                     <th>Primary Binding</th>
                     <th>Secondary Binding</th>
-                    <th>Remap</th>
+                    <th>Remap / Clear</th>
                   </tr>
                 </thead>
                 <tbody id="keybindsListBody">

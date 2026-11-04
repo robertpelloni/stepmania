@@ -109,12 +109,16 @@ class TestStepManiaDaemon(unittest.TestCase):
             self.assertEqual(data["status"], "ok")
             self.assertIn("dance-single", data["keybinds"])
             self.assertIn("pump-single", data["keybinds"])
+            self.assertIn("Coin", data["keybinds"]["dance-single"])
+            self.assertIn("Service", data["keybinds"]["dance-single"])
+            self.assertIn("OperatorMenu", data["keybinds"]["dance-single"])
 
         custom_payload = {
             "mode": "dance-single",
             "mappings": {
-                "Left": {"primary": "H", "secondary": "Left", "type": "dance"},
-                "Right": {"primary": "L", "secondary": "Right", "type": "dance"}
+                "Left": {"primary": "H", "secondary": "Left", "type": "gameplay"},
+                "Right": {"primary": "L", "secondary": "Right", "type": "gameplay"},
+                "Coin": {"primary": "C", "secondary": "5", "type": "arcade"}
             }
         }
         post_req = urllib.request.Request(
@@ -129,6 +133,8 @@ class TestStepManiaDaemon(unittest.TestCase):
             self.assertEqual(post_data["status"], "saved")
             self.assertEqual(post_data["keybinds"]["Left"]["primary"], "H")
             self.assertEqual(post_data["keybinds"]["Right"]["primary"], "L")
+            self.assertEqual(post_data["keybinds"]["Coin"]["primary"], "C")
+            self.assertEqual(post_data["keybinds"]["Coin"]["type"], "arcade")
 
     def test_launch_endpoint(self):
         url = f"{self.base_url}/api/launch"

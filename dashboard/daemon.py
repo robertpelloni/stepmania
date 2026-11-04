@@ -49,21 +49,27 @@ DAEMON_STATE = {
     },
     "keybinds": {
         "dance-single": {
-            "Left": {"primary": "ArrowLeft", "secondary": "D", "type": "dance"},
-            "Down": {"primary": "ArrowDown", "secondary": "F", "type": "dance"},
-            "Up": {"primary": "ArrowUp", "secondary": "J", "type": "dance"},
-            "Right": {"primary": "ArrowRight", "secondary": "K", "type": "dance"},
+            "Left": {"primary": "ArrowLeft", "secondary": "D", "type": "gameplay"},
+            "Down": {"primary": "ArrowDown", "secondary": "F", "type": "gameplay"},
+            "Up": {"primary": "ArrowUp", "secondary": "J", "type": "gameplay"},
+            "Right": {"primary": "ArrowRight", "secondary": "K", "type": "gameplay"},
             "Select": {"primary": "Enter", "secondary": "Space", "type": "nav"},
-            "Back": {"primary": "Escape", "secondary": "Backspace", "type": "nav"}
+            "Back": {"primary": "Escape", "secondary": "Backspace", "type": "nav"},
+            "Coin": {"primary": "5", "secondary": "None", "type": "arcade"},
+            "Service": {"primary": "F2", "secondary": "None", "type": "arcade"},
+            "OperatorMenu": {"primary": "ScrollLock", "secondary": "F1", "type": "arcade"}
         },
         "pump-single": {
-            "DownLeft": {"primary": "Z", "secondary": "Numpad1", "type": "pump"},
-            "UpLeft": {"primary": "Q", "secondary": "Numpad7", "type": "pump"},
-            "Center": {"primary": "S", "secondary": "Numpad5", "type": "pump"},
-            "UpRight": {"primary": "E", "secondary": "Numpad9", "type": "pump"},
-            "DownRight": {"primary": "C", "secondary": "Numpad3", "type": "pump"},
+            "DownLeft": {"primary": "Z", "secondary": "Numpad1", "type": "gameplay"},
+            "UpLeft": {"primary": "Q", "secondary": "Numpad7", "type": "gameplay"},
+            "Center": {"primary": "S", "secondary": "Numpad5", "type": "gameplay"},
+            "UpRight": {"primary": "E", "secondary": "Numpad9", "type": "gameplay"},
+            "DownRight": {"primary": "C", "secondary": "Numpad3", "type": "gameplay"},
             "Select": {"primary": "Enter", "secondary": "Space", "type": "nav"},
-            "Back": {"primary": "Escape", "secondary": "Backspace", "type": "nav"}
+            "Back": {"primary": "Escape", "secondary": "Backspace", "type": "nav"},
+            "Coin": {"primary": "5", "secondary": "None", "type": "arcade"},
+            "Service": {"primary": "F2", "secondary": "None", "type": "arcade"},
+            "OperatorMenu": {"primary": "ScrollLock", "secondary": "F1", "type": "arcade"}
         }
     },
     "packs": [
@@ -223,10 +229,18 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     DAEMON_STATE["keybinds"][mode] = {}
                 for action, keys in mappings.items():
                     if isinstance(keys, dict):
+                        cat = keys.get("type")
+                        if not cat:
+                            if action in ["Select", "Back"]:
+                                cat = "nav"
+                            elif action in ["Coin", "Service", "OperatorMenu"]:
+                                cat = "arcade"
+                            else:
+                                cat = "gameplay"
                         DAEMON_STATE["keybinds"][mode][action] = {
-                            "primary": keys.get("primary", ""),
-                            "secondary": keys.get("secondary", ""),
-                            "type": keys.get("type", "dance")
+                            "primary": keys.get("primary", "None"),
+                            "secondary": keys.get("secondary", "None"),
+                            "type": cat
                         }
                 log_daemon_event("INFO", f"Updated keybindings for {mode}.")
                 self.send_json_response(200, {
