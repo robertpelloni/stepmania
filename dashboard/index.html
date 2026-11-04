@@ -208,6 +208,7 @@
             <span class="hint-badge" data-tooltip="Real-time 1000Hz USB pad polling, debounce calibration, and sensor responsiveness">Real-Time IO</span>
           </div>
           <div class="header-actions">
+            <span class="badge badge-success" id="hwDeviceBadge" data-tooltip="Hardware controller status">USB Pad Connected</span>
             <select id="padModeSelect" class="form-select-sm" data-tooltip="Switch visualizer layout between 4-panel Dance (DDR/ITG) and 5-panel Pump">
               <option value="dance-single">Dance Single (4-Panel)</option>
               <option value="pump-single">Pump Single (5-Panel)</option>
@@ -216,6 +217,14 @@
           </div>
         </div>
         <div class="card-body">
+          <!-- Active Hardware Controller Information Bar -->
+          <div class="hw-device-info-bar" id="hwDeviceInfoBar" style="margin-bottom: 12px; padding: 6px 12px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 4px; font-size: 0.76rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong id="hwDeviceName">SM-USB Precision Stage IO Controller (rev 2.4)</strong>
+              <span class="text-muted" id="hwDeviceDriver">• evdev (Linux raw HID)</span>
+            </div>
+            <code id="hwDevicePath" style="color: var(--accent-cyan); font-size: 0.72rem;">/dev/input/by-id/usb-SM_Precision_Pad_01-event-joystick</code>
+          </div>
           <!-- Pad Visualizer Display -->
           <div class="dance-pad-visualizer" id="padVisualizer">
             <div class="pad-row">

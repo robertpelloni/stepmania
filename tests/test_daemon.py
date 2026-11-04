@@ -100,6 +100,23 @@ class TestStepManiaDaemon(unittest.TestCase):
             self.assertEqual(data["calibration"]["audio_offset_ms"], -5)
             self.assertEqual(data["calibration"]["mode"], "pump-single")
 
+    def test_hardware_endpoint(self):
+        """Test GET /api/hardware endpoint returns controller status and sensor diagnostics."""
+        url = f"{self.base_url}/api/hardware"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "ok")
+            self.assertIn("hardware", data)
+            hw = data["hardware"]
+            self.assertTrue(hw["connected"])
+            self.assertIn("device_name", hw)
+            self.assertIn("path", hw)
+            self.assertEqual(hw["polling_hz"], 1000)
+            self.assertIn("sensors", data)
+            self.assertIn("UP", data["sensors"])
+
     def test_keybinds_get_and_post(self):
         url = f"{self.base_url}/api/keybinds"
         req = urllib.request.Request(url)

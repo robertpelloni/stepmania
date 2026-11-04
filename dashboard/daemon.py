@@ -38,6 +38,15 @@ DAEMON_STATE = {
         "audio_offset_ms": -9,
         "mode": "dance-single"
     },
+    "hardware": {
+        "connected": True,
+        "device_name": "SM-USB Precision Stage IO Controller (rev 2.4)",
+        "driver": "evdev (Linux raw HID)",
+        "path": "/dev/input/by-id/usb-SM_Precision_Pad_01-event-joystick",
+        "polling_hz": 1000,
+        "jitter_ms": 0.18,
+        "firmware": "v2.4.1-lowlatency"
+    },
     "profile": {
         "name": "Robert P. (Arcade Operator)",
         "level": 85,
@@ -141,6 +150,19 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json_response(200, {
                 "polling_hz": DAEMON_STATE["polling_hz"],
                 "calibration": DAEMON_STATE["calibration"],
+                "sensors": {
+                    "LEFT": {"pressure": 82, "status": "nominal"},
+                    "UP": {"pressure": 88, "status": "nominal"},
+                    "DOWN": {"pressure": 85, "status": "nominal"},
+                    "RIGHT": {"pressure": 90, "status": "nominal"}
+                }
+            })
+            return
+
+        if self.path == "/api/hardware":
+            self.send_json_response(200, {
+                "status": "ok",
+                "hardware": DAEMON_STATE["hardware"],
                 "sensors": {
                     "LEFT": {"pressure": 82, "status": "nominal"},
                     "UP": {"pressure": 88, "status": "nominal"},

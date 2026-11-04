@@ -48,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elements: Hardware Diagnostics & Visualizer
   const padModeSelect = document.getElementById('padModeSelect');
   const padVisualizer = document.getElementById('padVisualizer');
+  const hwDeviceBadge = document.getElementById('hwDeviceBadge');
+  const hwDeviceName = document.getElementById('hwDeviceName');
+  const hwDeviceDriver = document.getElementById('hwDeviceDriver');
+  const hwDevicePath = document.getElementById('hwDevicePath');
   const debounceRange = document.getElementById('debounceRange');
   const debounceVal = document.getElementById('debounceVal');
   const offsetRange = document.getElementById('offsetRange');
@@ -423,6 +427,28 @@ document.addEventListener('DOMContentLoaded', () => {
     jitterVal.textContent = `Avg Jitter: ±${(Math.abs(jitter) * 0.9).toFixed(2)}ms`;
   }
 
+  // Fetch Hardware Device Status
+  async function loadHardwareStatus() {
+    try {
+      const res = await fetch('/api/hardware');
+      if (res.ok) {
+        const data = await res.json();
+        const hw = data.hardware;
+        if (hw && hwDeviceName && hwDevicePath) {
+          hwDeviceName.textContent = hw.device_name || 'USB Controller';
+          hwDeviceDriver.textContent = `• ${hw.driver || 'evdev'}`;
+          hwDevicePath.textContent = hw.path || '/dev/input/event0';
+          if (hwDeviceBadge) {
+            hwDeviceBadge.className = hw.connected ? 'badge badge-success' : 'badge badge-danger';
+            hwDeviceBadge.textContent = hw.connected ? 'USB Pad Connected' : 'Disconnected';
+          }
+        }
+      }
+    } catch (e) {
+      // offline fallback
+    }
+  }
+
   // Range inputs
   debounceRange.addEventListener('input', async (e) => {
     const val = e.target.value;
@@ -737,6 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize data
   fetchVersion();
   loadProfile();
+  loadHardwareStatus();
   loadKeybinds();
   syncDaemonHealth();
   setInterval(syncDaemonHealth, 5000);
