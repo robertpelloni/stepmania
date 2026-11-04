@@ -11,7 +11,7 @@
   <header class="header-bar">
     <div class="logo-area">
       <span class="logo-icon">🕹️</span>
-      <h1>StepMania <span class="badge" id="appVersion">v0.3.0</span></h1>
+      <h1>StepMania <span class="badge" id="appVersion">v0.4.0</span></h1>
       <span class="subtitle">Unified Rhythm Suite & Arcade Operator Control Plane</span>
     </div>
 
@@ -258,6 +258,41 @@
               <div class="log-entry">14:02:10.104 [EVDEV] Panel UP pressed (Pressure: 92%, Jitter: +0.08ms)</div>
               <div class="log-entry">14:02:10.218 [EVDEV] Panel UP released (Duration: 114ms)</div>
               <div class="log-entry">14:02:10.512 [EVDEV] Panel LEFT pressed (Pressure: 88%, Jitter: -0.12ms)</div>
+            </div>
+          </div>
+
+          <!-- Keybind & Input Remapping Manager -->
+          <div class="keybinds-manager" id="keybindsManager">
+            <div class="keybinds-header">
+              <div class="keybinds-title">
+                <strong>⌨️ Input Remapping & Keybinds</strong>
+                <span class="hint-badge" data-tooltip="Map physical keyboard keys and arcade pad buttons to rhythm commands">Direct Input</span>
+              </div>
+              <div class="keybinds-actions">
+                <button class="btn btn-xs btn-outline" id="resetKeybindsBtn" data-tooltip="Restore default keyboard and arcade pad assignments">Reset Defaults</button>
+                <button class="btn btn-xs btn-primary" id="saveKeybindsBtn" data-tooltip="Persist keybind mappings to daemon config">Save Keybinds</button>
+              </div>
+            </div>
+
+            <!-- Listening overlay/banner -->
+            <div class="keybind-listening-banner" id="keybindListeningBanner" style="display: none;">
+              <span>Press any key or pad sensor for <strong id="bindingTargetAction">ACTION</strong>... (Esc to cancel)</span>
+            </div>
+
+            <div class="keybind-table-wrapper">
+              <table class="keybind-table">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Primary Binding</th>
+                    <th>Secondary Binding</th>
+                    <th>Remap</th>
+                  </tr>
+                </thead>
+                <tbody id="keybindsListBody">
+                  <!-- Populated dynamically by app.js -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

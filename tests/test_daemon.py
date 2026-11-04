@@ -71,6 +71,38 @@ class TestStepManiaDaemon(unittest.TestCase):
             self.assertEqual(data["calibration"]["audio_offset_ms"], -5)
             self.assertEqual(data["calibration"]["mode"], "pump-single")
 
+    def test_keybinds_get_and_post(self):
+        # 1. GET keybinds
+        url = f"{self.base_url}/api/keybinds"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "ok")
+            self.assertIn("dance-single", data["keybinds"])
+            self.assertIn("pump-single", data["keybinds"])
+
+        # 2. POST custom keybind
+        custom_payload = {
+            "mode": "dance-single",
+            "mappings": {
+                "Left": {"primary": "H", "secondary": "Left", "type": "dance"},
+                "Right": {"primary": "L", "secondary": "Right", "type": "dance"}
+            }
+        }
+        post_req = urllib.request.Request(
+            url,
+            data=json.dumps(custom_payload).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(post_req, timeout=3) as post_resp:
+            self.assertEqual(post_resp.status, 200)
+            post_data = json.loads(post_resp.read().decode())
+            self.assertEqual(post_data["status"], "saved")
+            self.assertEqual(post_data["keybinds"]["Left"]["primary"], "H")
+            self.assertEqual(post_data["keybinds"]["Right"]["primary"], "L")
+
     def test_launch_endpoint(self):
         url = f"{self.base_url}/api/launch"
         payload = json.dumps({"fork": "bobmania"}).encode()

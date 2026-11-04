@@ -1,26 +1,23 @@
-# HANDOFF.md — Session Continuity & System State
+# HANDOFF.md — Session Summary & Continuity Guide
 
-## Session Overview
+## Session Overview (v0.4.0)
 - **Repository**: `robertpelloni/stepmania`
-- **Current Version**: 0.3.0 (`VERSION.md`)
-- **Nature of Repository**: Rhythm gaming hub, unified single-page dashboard, and operator control plane for Robert Pelloni's rhythm suite (`bobmania`, `itgmania`, `fcdm`).
+- **Current Version**: `0.4.0` (tracked in `VERSION.md`)
+- **Focus**: Completed Keybind & Input Remapping functionality, frontend visualizer integration, daemon persistence endpoints, and integration tests.
 
-## System Architecture Summary
-- **Single-Page Dashboard**: Located in `dashboard/` (`index.html`, `styles.css`, `app.js`).
-  - High-value launcher & fitness player profile.
-  - Song Pack Manager with real-time text search and style filtering.
-  - Hardware Diagnostics with 4-panel / 5-panel layout switcher, 4-panel sensor pressure bars, and live IO event log with jitter calculation.
-  - Server daemon supervision table.
-- **Backend Daemon**: `dashboard/daemon.py` on port 8080 with `/health`, `/api/packs`, `/api/diagnostics/pad`, `/api/control/*`, `/api/launch`.
-- **System Tray Agent**: Web UI popup and CLI tool `dashboard/tray_service.py`.
-- **Automated Health Prober**: `scripts/monitor_health.py` (`--json`, `--watch`).
+## Key Changes in v0.4.0
+1. **Keybind & Input Remapping**:
+   - Integrated Keybinds Manager in `dashboard/index.html` and `dashboard/styles.css`.
+   - Dynamic mode switching between Dance Single (4-panel) and Pump Single (5-panel).
+   - Press-to-bind interactive listener with keydown event interception and Esc cancellation.
+   - Restored-to-defaults and save keybind state persistence via `GET /api/keybinds` and `POST /api/keybinds`.
+2. **Integration Test Suite**:
+   - `tests/test_daemon.py` now includes `test_keybinds_get_and_post`, totaling 10 comprehensive tests.
+3. **Daemon State & API Updates**:
+   - Added `keybinds` dictionary to `DAEMON_STATE` in `dashboard/daemon.py`.
 
-## Operational Telemetry Baseline
-- Three-cycle consecutive sampling confirmed:
-  - 100% endpoint pass rate (4/4 endpoints).
-  - Average latency: ~14 ms.
-  - Zero dropped connections or socket leaks.
-
-## Verification Status
-- Validated via Playwright screenshot in `/home/jules/verification/dashboard_v0.3.0.png`.
-- Backend endpoints and multi-interval health monitor executed and verified.
+## Services & Ports
+- Control Daemon: `http://localhost:8080/`
+- Tray Controller CLI: `python3 dashboard/tray_service.py [status|start|restart|pause|quit|reload_songs]`
+- Health Monitor: `python3 scripts/monitor_health.py [--json] [--watch]`
+- Automated Test Suite: `pytest tests/test_daemon.py`

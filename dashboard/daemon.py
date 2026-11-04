@@ -27,6 +27,25 @@ DAEMON_STATE = {
         "audio_offset_ms": -9,
         "mode": "dance-single"
     },
+    "keybinds": {
+        "dance-single": {
+            "Left": {"primary": "ArrowLeft", "secondary": "D", "type": "dance"},
+            "Down": {"primary": "ArrowDown", "secondary": "F", "type": "dance"},
+            "Up": {"primary": "ArrowUp", "secondary": "J", "type": "dance"},
+            "Right": {"primary": "ArrowRight", "secondary": "K", "type": "dance"},
+            "Select": {"primary": "Enter", "secondary": "Space", "type": "nav"},
+            "Back": {"primary": "Escape", "secondary": "Backspace", "type": "nav"}
+        },
+        "pump-single": {
+            "DownLeft": {"primary": "Z", "secondary": "Numpad1", "type": "pump"},
+            "UpLeft": {"primary": "Q", "secondary": "Numpad7", "type": "pump"},
+            "Center": {"primary": "S", "secondary": "Numpad5", "type": "pump"},
+            "UpRight": {"primary": "E", "secondary": "Numpad9", "type": "pump"},
+            "DownRight": {"primary": "C", "secondary": "Numpad3", "type": "pump"},
+            "Select": {"primary": "Enter", "secondary": "Space", "type": "nav"},
+            "Back": {"primary": "Escape", "secondary": "Backspace", "type": "nav"}
+        }
+    },
     "packs": [
         {"id": "itg", "title": "In The Groove 1 & 2 Official", "songs": 142, "style": "itg", "status": "Mounted"},
         {"id": "ddr", "title": "DanceDanceRevolution A3 / World Simfiles", "songs": 188, "style": "ddr", "status": "Mounted"},
@@ -72,6 +91,14 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     "DOWN": {"pressure": 85, "status": "nominal"},
                     "RIGHT": {"pressure": 90, "status": "nominal"}
                 }
+            })
+            return
+
+        if self.path == "/api/keybinds":
+            self.send_json_response(200, {
+                "status": "ok",
+                "keybinds": DAEMON_STATE["keybinds"],
+                "active_mode": DAEMON_STATE["calibration"]["mode"]
             })
             return
 
@@ -122,6 +149,33 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     "status": "launched",
                     "fork": fork,
                     "message": f"Dispatched engine process for {fork} with 1000Hz polling."
+                })
+            except Exception as e:
+                self.send_json_response(400, {"error": str(e)})
+            return
+
+        if self.path == "/api/keybinds":
+            try:
+                payload = json.loads(body) if body else {}
+                mode = payload.get("mode", DAEMON_STATE["calibration"]["mode"])
+                mappings = payload.get("mappings")
+                if not mappings or not isinstance(mappings, dict):
+                    self.send_json_response(400, {"error": "Invalid or missing 'mappings' dictionary."})
+                    return
+                if mode not in DAEMON_STATE["keybinds"]:
+                    DAEMON_STATE["keybinds"][mode] = {}
+                for action, keys in mappings.items():
+                    if isinstance(keys, dict):
+                        DAEMON_STATE["keybinds"][mode][action] = {
+                            "primary": keys.get("primary", ""),
+                            "secondary": keys.get("secondary", ""),
+                            "type": keys.get("type", "dance")
+                        }
+                self.send_json_response(200, {
+                    "status": "saved",
+                    "mode": mode,
+                    "keybinds": DAEMON_STATE["keybinds"][mode],
+                    "message": f"Keybind configuration for {mode} saved successfully."
                 })
             except Exception as e:
                 self.send_json_response(400, {"error": str(e)})

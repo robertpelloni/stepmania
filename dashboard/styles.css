@@ -669,6 +669,92 @@ body {
   white-space: nowrap;
 }
 
+/* Keybind & Input Remapping Manager */
+.keybinds-manager {
+  margin-top: 16px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 12px;
+}
+
+.keybinds-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.keybinds-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.keybinds-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.keybind-listening-banner {
+  background: linear-gradient(90deg, rgba(255, 42, 133, 0.3), rgba(0, 229, 255, 0.3));
+  border: 1px solid var(--accent-pink);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 10px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.keybind-table-wrapper {
+  overflow-x: auto;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.keybind-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.keybind-table th, .keybind-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.keybind-table th {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.key-tag {
+  display: inline-block;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent-cyan);
+}
+
+.key-tag.secondary {
+  color: var(--text-muted);
+}
+
 /* Services Table */
 .services-table-wrapper {
   overflow-x: auto;

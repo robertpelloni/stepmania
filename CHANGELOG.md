@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-22
+
+### Added
+- **Keybind & Input Remapping Configuration** (`dashboard/`):
+  - Interactive table allowing live remapping of primary and secondary inputs for Dance (Left, Down, Up, Right, Select, Back) and Pump (DownLeft, UpLeft, Center, UpRight, DownRight).
+  - Live "Listen for Key / Pad Input" overlay banner capturing real-time keyboard/USB pad sensor events with escape cancellation.
+  - Reset to Defaults and Save Keybinds actions with toast feedback.
+  - Backend REST API endpoints `GET /api/keybinds` and `POST /api/keybinds` for hardware profile persistence.
+  - Integration test `test_keybinds_get_and_post` in `tests/test_daemon.py` (10/10 tests passing).
+
 ## [0.3.0] - 2026-10-22
 
 ### Added
@@ -20,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Automated Health & Telemetry Probing**:
   - `scripts/monitor_health.py` for automated health, latency, and performance monitoring.
 - **Automated Integration Test Suite**:
-  - `tests/test_daemon.py` covering 9 integration tests spanning REST APIs, tray CLI, calibration, and health checking.
+  - `tests/test_daemon.py` covering integration tests spanning REST APIs, tray CLI, calibration, and health checking.
 
 ## [0.2.0] - 2026-10-22
 

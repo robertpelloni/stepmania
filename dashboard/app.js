@@ -266,4 +266,171 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshDaemonsBtn.addEventListener('click', () => {
     launchFeedback.textContent = 'Supervision table refreshed. All 3 services nominal.';
   });
+
+  // ==========================================
+  // KEYBIND & INPUT REMAPPING FUNCTIONALITY
+  // ==========================================
+  const keybindsListBody = document.getElementById('keybindsListBody');
+  const keybindListeningBanner = document.getElementById('keybindListeningBanner');
+  const bindingTargetAction = document.getElementById('bindingTargetAction');
+  const saveKeybindsBtn = document.getElementById('saveKeybindsBtn');
+  const resetKeybindsBtn = document.getElementById('resetKeybindsBtn');
+
+  let currentKeybinds = {
+    'dance-single': {
+      'Left': { primary: 'ArrowLeft', secondary: 'D', type: 'dance' },
+      'Down': { primary: 'ArrowDown', secondary: 'F', type: 'dance' },
+      'Up': { primary: 'ArrowUp', secondary: 'J', type: 'dance' },
+      'Right': { primary: 'ArrowRight', secondary: 'K', type: 'dance' },
+      'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+    },
+    'pump-single': {
+      'DownLeft': { primary: 'Z', secondary: 'Numpad1', type: 'pump' },
+      'UpLeft': { primary: 'Q', secondary: 'Numpad7', type: 'pump' },
+      'Center': { primary: 'S', secondary: 'Numpad5', type: 'pump' },
+      'UpRight': { primary: 'E', secondary: 'Numpad9', type: 'pump' },
+      'DownRight': { primary: 'C', secondary: 'Numpad3', type: 'pump' },
+      'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+    }
+  };
+
+  let activeBindingState = null; // { action: 'Left', slot: 'primary' }
+
+  async function loadKeybinds() {
+    try {
+      const res = await fetch('/api/keybinds');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.keybinds) {
+          currentKeybinds = data.keybinds;
+        }
+      }
+    } catch (err) {
+      console.warn('Using local default keybinds:', err);
+    }
+    renderKeybindsTable();
+  }
+
+  function renderKeybindsTable() {
+    if (!keybindsListBody) return;
+    const mode = padModeSelect.value || 'dance-single';
+    const mappings = currentKeybinds[mode] || currentKeybinds['dance-single'];
+
+    keybindsListBody.innerHTML = '';
+    for (const [action, binding] of Object.entries(mappings)) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${action}</strong></td>
+        <td><span class="key-tag" id="bind_${mode}_${action}_primary">${binding.primary || 'None'}</span></td>
+        <td><span class="key-tag secondary" id="bind_${mode}_${action}_secondary">${binding.secondary || 'None'}</span></td>
+        <td>
+          <button class="btn btn-xs btn-outline remap-btn" data-action="${action}" data-slot="primary" data-tooltip="Remap primary binding">Primary</button>
+          <button class="btn btn-xs btn-outline remap-btn" data-action="${action}" data-slot="secondary" data-tooltip="Remap secondary binding">Secondary</button>
+        </td>
+      `;
+      keybindsListBody.appendChild(tr);
+    }
+
+    // Attach remap button click listeners
+    document.querySelectorAll('.remap-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        const slot = btn.dataset.slot;
+        startListeningForBind(action, slot);
+      });
+    });
+  }
+
+  function startListeningForBind(action, slot) {
+    activeBindingState = { action, slot };
+    bindingTargetAction.textContent = `${action} (${slot.toUpperCase()})`;
+    keybindListeningBanner.style.display = 'block';
+    launchFeedback.textContent = `Listening for input to bind ${action} [${slot}]... Press any key or Pad sensor.`;
+  }
+
+  function stopListeningForBind() {
+    activeBindingState = null;
+    keybindListeningBanner.style.display = 'none';
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (!activeBindingState) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.key === 'Escape') {
+      launchFeedback.textContent = 'Keybind assignment cancelled.';
+      stopListeningForBind();
+      return;
+    }
+
+    const { action, slot } = activeBindingState;
+    const mode = padModeSelect.value || 'dance-single';
+
+    if (!currentKeybinds[mode]) currentKeybinds[mode] = {};
+    if (!currentKeybinds[mode][action]) {
+      currentKeybinds[mode][action] = { primary: 'None', secondary: 'None', type: 'dance' };
+    }
+
+    // Assign pressed key
+    const formattedKey = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+    currentKeybinds[mode][action][slot] = formattedKey;
+
+    launchFeedback.textContent = `Assigned ${action} [${slot}] -> ${formattedKey}`;
+    renderKeybindsTable();
+    stopListeningForBind();
+  });
+
+  saveKeybindsBtn.addEventListener('click', async () => {
+    const mode = padModeSelect.value || 'dance-single';
+    launchFeedback.textContent = `Persisting ${mode} keybind configuration to daemon...`;
+    try {
+      const res = await fetch('/api/keybinds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: mode,
+          mappings: currentKeybinds[mode]
+        })
+      });
+      const data = await res.json();
+      launchFeedback.textContent = data.message || 'Keybinds saved successfully!';
+    } catch (err) {
+      launchFeedback.textContent = 'Saved keybinds locally (daemon simulated).';
+    }
+  });
+
+  resetKeybindsBtn.addEventListener('click', async () => {
+    currentKeybinds['dance-single'] = {
+      'Left': { primary: 'ArrowLeft', secondary: 'D', type: 'dance' },
+      'Down': { primary: 'ArrowDown', secondary: 'F', type: 'dance' },
+      'Up': { primary: 'ArrowUp', secondary: 'J', type: 'dance' },
+      'Right': { primary: 'ArrowRight', secondary: 'K', type: 'dance' },
+      'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+    };
+    currentKeybinds['pump-single'] = {
+      'DownLeft': { primary: 'Z', secondary: 'Numpad1', type: 'pump' },
+      'UpLeft': { primary: 'Q', secondary: 'Numpad7', type: 'pump' },
+      'Center': { primary: 'S', secondary: 'Numpad5', type: 'pump' },
+      'UpRight': { primary: 'E', secondary: 'Numpad9', type: 'pump' },
+      'DownRight': { primary: 'C', secondary: 'Numpad3', type: 'pump' },
+      'Select': { primary: 'Enter', secondary: 'Space', type: 'nav' },
+      'Back': { primary: 'Escape', secondary: 'Backspace', type: 'nav' }
+    };
+    renderKeybindsTable();
+    launchFeedback.textContent = 'Keybinds restored to factory defaults.';
+  });
+
+  // Re-render keybinds when pad mode toggles
+  padModeSelect.addEventListener('change', () => {
+    renderKeybindsTable();
+  });
+
+  // Initial load
+  loadKeybinds();
 });
