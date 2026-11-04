@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Individual live sensor sensitivity and pressure meters for each panel (LEFT, UP, DOWN, RIGHT).
   - Live IO event stream and polling jitter monitor tracking timestamped input events and duration.
   - Backend calibration endpoints: `GET /api/diagnostics/pad` and `POST /api/diagnostics/calibrate`.
+- **Automated Health & Telemetry Probing**:
+  - `scripts/monitor_health.py` for automated health, latency, and performance monitoring.
+- **Automated Integration Test Suite**:
+  - `tests/test_daemon.py` covering 9 integration tests spanning REST APIs, tray CLI, calibration, and health checking.
 
 ## [0.2.0] - 2026-10-22
 

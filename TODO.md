@@ -9,6 +9,7 @@
 - [x] Implement `/api/packs` and `/api/diagnostics/pad` endpoints in `dashboard/daemon.py`.
 - [x] Create automated health check and latency prober in `scripts/monitor_health.py`.
 - [x] Document automated health check and continuous watch commands in `DEPLOY.md`.
+- [x] Create unit and integration test suite in `tests/test_daemon.py` (9/9 tests passing).
 - [x] Verify UI functionality with Playwright automated screenshot.
 
 ## Future Milestones
