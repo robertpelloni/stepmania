@@ -1,0 +1,199 @@
+import json
+import os
+import sys
+import threading
+import time
+import unittest
+import urllib.request
+import urllib.error
+
+# Add repo root to sys.path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BASE_DIR)
+
+from dashboard.daemon import ThreadedHTTPServer, DashboardHandler, DAEMON_STATE
+import dashboard.tray_service as tray_service
+import scripts.monitor_health as monitor_health
+
+TEST_PORT = 8089
+
+class TestStepManiaDaemon(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.server = ThreadedHTTPServer(("127.0.0.1", TEST_PORT), DashboardHandler)
+        cls.server_thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.server_thread.start()
+        time.sleep(0.2)
+        cls.base_url = f"http://127.0.0.1:{TEST_PORT}"
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+
+    def test_health_endpoint(self):
+        url = f"{self.base_url}/health"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertIn("status", data)
+            self.assertIn("version", data)
+            self.assertIn("active_fork", data)
+            self.assertIn("services", data)
+
+    def test_version_endpoint(self):
+        url = f"{self.base_url}/api/version"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertIn("version", data)
+            self.assertEqual(data["status"], "ok")
+
+    def test_profile_endpoint(self):
+        url = f"{self.base_url}/api/profile"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["name"], "Robert P. (Arcade Operator)")
+            self.assertGreater(data["songs_cleared"], 1000)
+            self.assertIn("session_calories", data)
+
+    def test_logs_endpoint(self):
+        url = f"{self.base_url}/api/logs"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "ok")
+            self.assertIsInstance(data["logs"], list)
+
+    def test_packs_endpoint(self):
+        url = f"{self.base_url}/api/packs"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertIn("packs", data)
+            self.assertGreater(data["total_songs"], 0)
+
+    def test_diagnostics_pad_endpoint(self):
+        url = f"{self.base_url}/api/diagnostics/pad"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["polling_hz"], 1000)
+            self.assertIn("sensors", data)
+
+    def test_calibrate_endpoint(self):
+        url = f"{self.base_url}/api/diagnostics/calibrate"
+        payload = json.dumps({"debounce_ms": 15, "audio_offset_ms": -5, "mode": "pump-single"}).encode()
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "calibrated")
+            self.assertEqual(data["calibration"]["debounce_ms"], 15)
+            self.assertEqual(data["calibration"]["audio_offset_ms"], -5)
+            self.assertEqual(data["calibration"]["mode"], "pump-single")
+
+    def test_hardware_endpoint(self):
+        """Test GET /api/hardware endpoint returns controller status and sensor diagnostics."""
+        url = f"{self.base_url}/api/hardware"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "ok")
+            self.assertIn("hardware", data)
+            hw = data["hardware"]
+            self.assertTrue(hw["connected"])
+            self.assertIn("device_name", hw)
+            self.assertIn("path", hw)
+            self.assertEqual(hw["polling_hz"], 1000)
+            self.assertIn("sensors", data)
+            self.assertIn("UP", data["sensors"])
+
+    def test_keybinds_get_and_post(self):
+        url = f"{self.base_url}/api/keybinds"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "ok")
+            self.assertIn("dance-single", data["keybinds"])
+            self.assertIn("pump-single", data["keybinds"])
+            self.assertIn("Coin", data["keybinds"]["dance-single"])
+            self.assertIn("Service", data["keybinds"]["dance-single"])
+            self.assertIn("OperatorMenu", data["keybinds"]["dance-single"])
+
+        custom_payload = {
+            "mode": "dance-single",
+            "mappings": {
+                "Left": {"primary": "H", "secondary": "Left", "type": "gameplay"},
+                "Right": {"primary": "L", "secondary": "Right", "type": "gameplay"},
+                "Coin": {"primary": "C", "secondary": "5", "type": "arcade"}
+            }
+        }
+        post_req = urllib.request.Request(
+            url,
+            data=json.dumps(custom_payload).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(post_req, timeout=3) as post_resp:
+            self.assertEqual(post_resp.status, 200)
+            post_data = json.loads(post_resp.read().decode())
+            self.assertEqual(post_data["status"], "saved")
+            self.assertEqual(post_data["keybinds"]["Left"]["primary"], "H")
+            self.assertEqual(post_data["keybinds"]["Right"]["primary"], "L")
+            self.assertEqual(post_data["keybinds"]["Coin"]["primary"], "C")
+            self.assertEqual(post_data["keybinds"]["Coin"]["type"], "arcade")
+
+    def test_launch_endpoint(self):
+        url = f"{self.base_url}/api/launch"
+        payload = json.dumps({"fork": "bobmania"}).encode()
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode())
+            self.assertEqual(data["status"], "launched")
+            self.assertEqual(data["fork"], "bobmania")
+
+    def test_control_actions(self):
+        for action in ["start", "restart", "pause", "reload_songs"]:
+            url = f"{self.base_url}/api/control/{action}"
+            req = urllib.request.Request(url, data=b"{}", headers={"Content-Type": "application/json"}, method="POST")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                self.assertEqual(resp.status, 200)
+                data = json.loads(resp.read().decode())
+                self.assertEqual(data["status"], "ok")
+                self.assertEqual(data["action"], action)
+
+    def test_static_asset_index(self):
+        url = f"{self.base_url}/index.html"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            self.assertEqual(resp.status, 200)
+            content = resp.read().decode()
+            self.assertIn("StepMania", content)
+            self.assertIn("Song Pack", content)
+            self.assertIn("Hardware Diagnostics", content)
+
+    def test_tray_service_integration(self):
+        status_ok = tray_service.get_status(self.base_url)
+        self.assertTrue(status_ok)
+        action_ok = tray_service.send_action("restart", self.base_url)
+        self.assertTrue(action_ok)
+        logs_ok = tray_service.get_logs(self.base_url)
+        self.assertTrue(logs_ok)
+
+    def test_monitor_health_check(self):
+        health_ok = monitor_health.run_health_check(self.base_url, as_json=True)
+        self.assertTrue(health_ok)
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,79 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.5.0] - 2026-11-04
+
+### Added
+- **Arcade Operator Keybind Configuration & Input Remapping** (`dashboard/`):
+  - Integrated arcade cabinet buttons (`Coin`, `Service`, `OperatorMenu`) alongside rhythm pad arrows and navigation inputs.
+  - Category filtering buttons in the Keybind Manager (`All`, `Gameplay`, `Navigation`, `Arcade Cabinet`).
+  - Keybind clearing capability (`Clear` button per action) with live visual updates and log recording.
+  - Intelligent category classification and fallback in `dashboard/daemon.py` for persistent configuration.
+- **Single-Page Consolidated Operator Architecture Redesign** (`dashboard/`):
+  - Re-architected layout into a single, high-value hierarchy: Hero Game Launcher & Active Player Profile card at top, followed by two-column Song Pack Manager and Hardware Pad Visualizer, concluding with System Services & Activity Log stream.
+  - Interactive Song Pack Details Inspector drawer with song counts, difficulty breakdown, chart formats, and filesystem storage location.
+  - Dynamic single source of truth version synchronization: backend daemon and frontend UI query `VERSION.md` dynamically via `/api/version`.
+  - Added `/api/profile` endpoint for arcade player and operator stats (session calories, accuracy, timing offset).
+  - Added `/api/logs` endpoint and UI live activity log stream capturing background daemon IPC actions and events.
+  - Interactive tooltips (`[data-tooltip]`) and explanation indicators on all inputs, labels, and metrics.
+- **Unified Scripts Orchestration**:
+  - Added `scripts/dashboard_ctl.sh` providing unified command-line control (`start`, `stop`, `restart`, `status`, `probe`, `logs`, `test`).
+  - Extended `dashboard/tray_service.py` to support `logs` retrieval from the CLI.
+- **Automated Verification**:
+  - Expanded test suite in `tests/test_daemon.py` to 13 tests covering all new endpoints (`/api/version`, `/api/profile`, `/api/logs`, keybind remapping).
+  - Playwright end-to-end browser verification script capturing full single-page layout screenshot.
+
+## [0.4.0] - 2026-10-22
+
+### Added
+- **Keybind & Input Remapping Configuration** (`dashboard/`):
+  - Interactive table allowing live remapping of primary and secondary inputs for Dance (Left, Down, Up, Right, Select, Back) and Pump (DownLeft, UpLeft, Center, UpRight, DownRight).
+  - Live "Listen for Key / Pad Input" overlay banner capturing real-time keyboard/USB pad sensor events with escape cancellation.
+  - Reset to Defaults and Save Keybinds actions with toast feedback.
+  - Backend REST API endpoints `GET /api/keybinds` and `POST /api/keybinds` for hardware profile persistence.
+  - Integration test `test_keybinds_get_and_post` in `tests/test_daemon.py`.
+
+## [0.3.0] - 2026-10-22
+
+### Added
+- **Song Pack Manager Enhancements** (`dashboard/`):
+  - Real-time client-side pack search bar and style/category dropdown filters (`All`, `ITG`, `DDR`, `Fitness`).
+  - Pack details inspection trigger with difficulty ranges, song counts, and pack health metrics.
+  - Backend REST API endpoint: `GET /api/packs` providing song counts and mount state.
+- **Hardware Diagnostics & IO Stream Upgrades**:
+  - Pad layout mode toggle: Dance Single (4-panel DDR/ITG) vs. Pump Single (5-panel diagonal).
+  - Individual live sensor sensitivity and pressure meters for each panel (LEFT, UP, DOWN, RIGHT).
+  - Live IO event stream and polling jitter monitor tracking timestamped input events and duration.
+  - Backend calibration endpoints: `GET /api/diagnostics/pad` and `POST /api/diagnostics/calibrate`.
+- **Automated Health & Telemetry Probing**:
+  - `scripts/monitor_health.py` for automated health, latency, and performance monitoring.
+- **Automated Integration Test Suite**:
+  - `tests/test_daemon.py` covering integration tests spanning REST APIs, tray CLI, calibration, and health checking.
+
+## [0.2.0] - 2026-10-22
+
+### Added
+- **Unified Single-Page Operator & Player Dashboard** (`dashboard/`):
+  - Consolidated single-page architecture eliminating fragmented navigation.
+  - Prominent high-value Game Launcher & Active Player Profile card.
+  - Interactive Song Pack Manager with drag-and-drop installer zone.
+  - Hardware Diagnostics & 1000Hz USB Dance Pad Visualizer with debounce and audio sync calibration.
+  - Multi-service daemon supervision table for bobmania, itgmania, and fcdm.
+  - Interactive tooltips (`[data-tooltip]`) and contextual guidance badges across all controls.
+- **System Tray Controller & Background Daemon**:
+  - `dashboard/daemon.py`: Multi-threaded HTTP/REST server providing health checks, IPC engine launch endpoints, and graceful termination.
+  - `dashboard/tray_service.py`: CLI and tray controller for daemon actions (`status`, `start`, `restart`, `pause`, `quit`).
+  - Web System Tray interface with popup controls and live indicator dot.
+- **Operational Scripts**:
+  - `scripts/run_dashboard.sh`: Automated daemon startup and port orchestration.
+  - `scripts/stop_dashboard.sh`: Graceful shutdown signal dispatch.
+
+## [0.1.0] - 2026-10-22
+
+### Added
+- Standard project governance and architecture documentation:
+  - `VERSION.md`, `VISION.md`, `MEMORY.md`, `DEPLOY.md`, `IDEAS.md`, `ROADMAP.md`, `TODO.md`, `HANDOFF.md`, `README.md`.
