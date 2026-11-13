@@ -1,6 +1,6 @@
 # stepmania (placeholder)
 
-This repository is a **name placeholder** — it currently holds only this README and no code.
+This repository is a **name placeholder** — it currently holds only this README and no code. Created 2026-06-19; last touched 2026-10-22 (README rewrite).
 
 Robert Pelloni's actual StepMania-related work lives in:
 
